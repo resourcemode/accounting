@@ -16,10 +16,11 @@ export async function cleanTables() {
     imports: [DbModule],
   }).compile();
 
-  const models: ModelCtor<Model>[] = [Ticket, User, Company];
-  for (const model of models) {
-    await cleanTable(model);
-  }
+  // Order matters here - delete child records before parents to avoid foreign key constraints
+  // First delete tickets, then users, then companies
+  await cleanTable(Ticket);
+  await cleanTable(User);
+  await cleanTable(Company);
 
   async function cleanTable<T extends Model>(model: ModelCtor<T>) {
     const options: DestroyOptions = {
