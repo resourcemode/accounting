@@ -132,10 +132,23 @@ considered in our code review session.
 
 Here are some of the topics you can consider:
 
-- [ ]  Code Quality
-- [ ]  Fixing Subtle Errors
-- [ ]  Using Tests
-- [ ]  Performance Considerations
+- [x]  Code Quality
+  - Added Swagger API documentation
+  - Implemented validation using class-validator
+  - Added consistent error handling with custom exception filters
+  - Structured code with proper separation of concerns
+- [x]  Fixing Subtle Errors
+  - Implemented transactional operations for better data consistency
+  - Added proper error handling for edge cases
+  - Fixed test suite to work with new dependencies
+- [x]  Using Tests
+  - Improved test infrastructure with better mocking
+  - Created clear separation between unit and integration tests
+  - Enhanced test resilience
+- [x]  Performance Considerations
+  - Implemented configuration management for better flexibility
+  - Added asynchronous report processing
+  - Optimized database operations with transactions
 
 # Project setup and run
 
@@ -155,12 +168,24 @@ docker-compose up -d
 npm run db:migrate
 ```
 
-4. Start the server
+4. Load sample data (optional)
+```sh
+npm run seed
+```
+This will populate the database with 3 companies, 5 users with different roles, and 5 sample tickets for testing.
+
+5. Start the server
 ```sh
 npm start
 ```
 
-5. Go to http://localhost:3000/api/v1/healthcheck 🍾
+6. Go to http://localhost:8080/api/v1/healthcheck 🍾
+
+7. Access API Documentation
+```
+http://localhost:8080/api/docs
+```
+The Swagger UI provides interactive documentation for all API endpoints.
 
 # Testing
 We use the integration tests instead of a unit ones for controllers.
@@ -185,5 +210,15 @@ npm run db:migrate:test
 
 4. Test
 ```sh
+# Run all tests
 npm test
+
+# Run only unit tests
+npm run test:unit
+
+# Run only integration tests 
+npm run test:integration
+
+# Run tests with coverage report
+npm run test:coverage
 ```
