@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReportsController } from '../../../src/reports/reports.controller';
 import { ReportStatus, ReportType, ReportsService, ReportsStatusResponse } from '../../../src/reports/reports.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { MockCacheModule } from '../../../src/cache/test/mock-cache.module';
 
 // Sample report status response
 const sampleStatusResponse: ReportsStatusResponse = {
@@ -24,9 +26,11 @@ const mockReportsService = {
 describe('ReportsController', () => {
   let controller: ReportsController;
   let service: ReportsService;
+  let cacheManager: any;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [MockCacheModule],
       controllers: [ReportsController],
       providers: [
         {
@@ -38,9 +42,12 @@ describe('ReportsController', () => {
 
     controller = module.get<ReportsController>(ReportsController);
     service = module.get<ReportsService>(ReportsService);
+    cacheManager = module.get(CACHE_MANAGER);
 
     // Clear all mocks before each test
     jest.clearAllMocks();
+    // Reset cache
+    cacheManager.reset();
   });
 
   it('should be defined', () => {

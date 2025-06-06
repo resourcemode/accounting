@@ -10,3 +10,10 @@ services:
       - POSTGRES_DB=task-dev
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
+
+  redis:
+    container_name: interview_task_redis
+    image: redis:7-alpine
+    ports:
+      - 6380:6379
+    command: redis-server --save 60 1 --loglevel warning

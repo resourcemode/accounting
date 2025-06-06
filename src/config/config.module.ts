@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import reportsConfig from './reports.config';
+import cacheConfig from './cache.config';
 
 /**
  * Configuration module for the application
@@ -10,7 +11,7 @@ import reportsConfig from './reports.config';
   imports: [
     NestConfigModule.forRoot({
       isGlobal: true,
-      load: [reportsConfig],
+      load: [reportsConfig, cacheConfig],
       envFilePath: ['.env', '.env.local'],
     }),
   ],

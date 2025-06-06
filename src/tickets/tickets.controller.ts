@@ -1,18 +1,26 @@
-import { Body, Controller, Get, Post, ValidationPipe, HttpStatus, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Body, Controller, Get, Post, ValidationPipe, HttpStatus, InternalServerErrorException, NotFoundException, UseInterceptors, Inject } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { CacheInterceptor, CacheKey, CacheTTL, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { TicketType } from '../../db/models/Ticket';
 import { CreateTicketDto, TicketResponseDto, TicketsService } from './tickets.service';
 
 @ApiTags('tickets')
 @Controller('api/v1/tickets')
 export class TicketsController {
-  constructor(private readonly ticketsService: TicketsService) {}
+  constructor(
+    private readonly ticketsService: TicketsService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
+  ) {}
   
   /**
    * Get all tickets
    * @returns List of all tickets
    */
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('all-tickets')
+  @CacheTTL(3600) // Cache for 1 hour (3600 seconds)
   @ApiOperation({ summary: 'Get all tickets' })
   @ApiResponse({ 
     status: HttpStatus.OK, 
@@ -77,7 +85,13 @@ export class TicketsController {
     createTicketDto: CreateTicketDto
   ): Promise<TicketResponseDto> {
     try {
-      return await this.ticketsService.createTicket(createTicketDto);
+      // Create the ticket
+      const result = await this.ticketsService.createTicket(createTicketDto);
+      
+      // Invalidate the cache to ensure fresh data is fetched next time
+      await this.cacheManager.del('all-tickets');
+      
+      return result;
     } catch (error) {
       // Re-throw NestJS exceptions as they already have proper HTTP status codes
       if (error.status) {
